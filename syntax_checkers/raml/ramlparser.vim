@@ -22,36 +22,30 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! SyntaxCheckers_raml_ramlparser_IsAvailable() dict
-    call syntastic#log#deprecationWarn('ramlparser_exec', 'raml_ramlparser_exec')
-    if !executable(self.getExec())
-        return 0
-    endif
-
-    let ver = self.getVersion()
-    let s:ramlparser_new = syntastic#util#versionIsAtLeast(ver, [1, 1])
-
-    return syntastic#util#versionIsAtLeast(ver, [1])
+    return executable(self.getExec())
 endfunction
 
 function! SyntaxCheckers_raml_ramlparser_GetLocList() dict
     "call syntastic#log#deprecationWarn('raml_ramlparser_conf', 'raml_ramlparser_args', "'--config ' . syntastic#util#shexpand(OLD_VAR)")
 
-    let makeprg = self.makeprgBuild({ 'args_after': (s:ramlparser_new ? '--verbose ' : '') })
+    let makeprg = self.makeprgBuild({ 'args_after': '' })
 
-    let errorformat = s:ramlparser_new ?
-        \ '%A%f: line %l\, col %v\, %m \(%t%*\d\)' :
-        \ '%E%f: line %l\, col %v\, %m'
+    let errorformat  = '%EContext%.%#,'
+    let errorformat .= '%ZColumn:%v,'
+    let errorformat .= '%CMessage:%m,'
+    let errorformat .= '%CFile:%f,'
+    let errorformat .= '%CLine:%l'
 
     return SyntasticMake({
         \ 'makeprg': makeprg,
         \ 'errorformat': errorformat,
         \ 'defaults': {'bufnr': bufnr('')},
-        \ 'returns': [0, 2] })
+        \ 'returns': [0, 1] })
 endfunction
 
 call g:SyntasticRegistry.CreateAndRegisterChecker({
     \ 'filetype': 'raml',
-    \ 'exec': 'raml-parser',
+    \ 'exec': 'raml-parser-machine-friendly',
     \ 'name': 'ramlparser'})
 
 let &cpo = s:save_cpo
