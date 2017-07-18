@@ -1,3 +1,5 @@
+Note: This repository is no longer maintained.
+
 # vim-syntaxcheker-raml-raml-parser
 raml syntax checker for syntastic
 
